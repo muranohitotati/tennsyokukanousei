@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>貴方だけの副業計画</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>貴方だけの副業計画</h1>
+            <p>いくつかの質問に答えて、あなたにピッタリの副業と1年間の成功計画を見つけましょう。</p>
+        </header>
+
+        <main id="app">
+            <div id="start-screen">
+                <button id="start-btn">計画を始める</button>
+            </div>
+
+            <div id="questionnaire" class="hidden">
+                <div id="question-container"></div>
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+
+            <div id="results" class="hidden">
+                <h2>あなたへのおすすめ副業</h2>
+                <div id="results-container"></div>
+            </div>
+
+            <div id="plan" class="hidden">
+                <h2><span id="plan-title"></span> 1年間の成功計画</h2>
+                <div id="plan-container"></div>
+                <button id="restart-btn">最初からやり直す</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 副業計画ツール</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
