@@ -1,1 +1,1 @@
-Rewrite app to be API-free with pre-defined results
+Feat: Add business examples to diagnosis results
