@@ -1,1 +1,1 @@
-Add placeholder for API key
+Rewrite app to be API-free with pre-defined results
