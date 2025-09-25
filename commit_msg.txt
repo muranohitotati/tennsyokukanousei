@@ -1,0 +1,1 @@
+Rewrite application as "Hidden Talent Discovery Mirror"

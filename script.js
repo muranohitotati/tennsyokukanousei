@@ -18,92 +18,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const questions = [
         {
-            key: 'interest',
-            text: 'どの分野に最も興味がありますか？',
+            key: 'joy',
+            text: '休日に何をしている時が、一番充実していますか？',
             options: [
-                { text: '文章を書いたり、情報を発信する', value: 'writing' },
-                { text: 'デザインやイラストなど、創作活動', value: 'creative' },
-                { text: 'プログラミングやデータ分析', value: 'tech' },
-                { text: '人と話し、教えたり助けたりする', value: 'coaching' },
-                { text: '手作業で何かを作ったり、作業したりする', value: 'manual' },
+                { text: '友人と集まって語り合う', value: 'people' },
+                { text: '新しいアイデアを形にする創作活動', value: 'creative' },
+                { text: '複雑な問題を解き明かす', value: 'logic' },
+                { text: '一つのことに黙々と集中する', value: 'focus' },
+                { text: 'チームをまとめて目標を達成する', value: 'lead' },
             ],
         },
         {
-            key: 'time',
-            text: '週にどれくらいの時間を副業に使えますか？',
+            key: 'strength',
+            text: '他人から「ありがとう」と言われるのは、どんな時が多いですか？',
             options: [
-                { text: '5時間未満', value: 'low' },
-                { text: '5〜10時間', value: 'medium' },
-                { text: '10時間以上', value: 'high' },
+                { text: '話を聞いてくれて、気持ちが楽になった', value: 'empathy' },
+                { text: '誰も気づかないようなミスを見つけてくれた', value: 'detail' },
+                { text: '難しいことを分かりやすく整理してくれた', value: 'structure' },
+                { text: 'あなたのアイデアは本当に面白いね', value: 'idea' },
+                { text: 'リーダーシップに助けられた', value: 'management' },
             ],
         },
         {
-            key: 'income',
-            text: '月々の目標収入はどれくらいですか？',
+            key: 'motivation',
+            text: 'どんな状況で最も「やる気」が出ますか？',
             options: [
-                { text: 'まずは〜3万円', value: 'low' },
-                { text: '5万円以上', value: 'medium' },
-                { text: '10万円以上', value: 'high' },
+                { text: '誰かの役に立っていると実感した時', value: 'support' },
+                { text: '自分の手で完璧なものを作り上げた時', value: 'perfection' },
+                { text: '誰も思いつかない方法を発見した時', value: 'discovery' },
+                { text: '計画通りに物事が進んでいる時', value: 'planning' },
+                { text: '困難な目標をチームで乗り越えた時', value: 'teamwork' },
             ],
         },
         {
-            key: 'style',
-            text: 'どのような働き方が理想ですか？',
+            key: 'approach',
+            text: '未知の課題に取り組む時、あなたはどうしますか？',
             options: [
-                { text: '自分のペースでコンテンツや商品を作る', value: 'product' },
-                { text: 'クライアントの要望に応えて仕事をする', value: 'client' },
-                { text: '自分の知識やスキルを直接提供する', value: 'service' },
+                { text: 'まずは関連する人々と話し、情報を集める', value: 'communication' },
+                { text: '過去の事例やデータを徹底的に分析する', value: 'analysis' },
+                { text: '直感を信じて、まず試してみる', value: 'intuition' },
+                { text: '詳細なステップを書き出し、計画を立てる', value: 'stepbystep' },
+                { text: 'とにかく手を動かしながら、試行錯誤する', value: 'trial' },
             ],
         },
     ];
 
-    const sideHustles = [
-        { name: 'ブログ・アフィリエイト', tags: ['writing', 'product', 'low-time', 'medium-time', 'high-time', 'low-income', 'medium-income', 'high-income'], desc: '興味のある分野について記事を書き、広告収入や商品紹介で収益を得ます。' },
-        { name: 'Webライター', tags: ['writing', 'client', 'low-time', 'medium-time', 'high-time', 'low-income', 'medium-income'], desc: '企業のウェブサイトやメディアの記事を執筆します。' },
-        { name: 'SNS運用代行', tags: ['writing', 'coaching', 'client', 'medium-time', 'high-time', 'medium-income', 'high-income'], desc: '企業や個人のSNSアカウントの投稿作成や分析を代行します。' },
-        { name: 'イラスト販売', tags: ['creative', 'product', 'low-time', 'medium-time', 'high-time', 'low-income', 'medium-income'], desc: '自分で描いたイラストをオンラインで販売します。' },
-        { name: 'デザイン制作', tags: ['creative', 'client', 'medium-time', 'high-time', 'medium-income', 'high-income'], desc: 'ロゴ、バナー、ウェブサイトなどのデザインを請け負います。' },
-        { name: '動画編集', tags: ['creative', 'tech', 'client', 'medium-time', 'high-time', 'medium-income', 'high-income'], desc: 'YouTuberや企業の動画を編集します。' },
-        { name: 'プログラミング', tags: ['tech', 'client', 'medium-time', 'high-time', 'medium-income', 'high-income'], desc: 'ウェブサイト制作や小規模なツール開発などを請け負います。' },
-        { name: 'オンラインアシスタント', tags: ['manual', 'writing', 'client', 'low-time', 'medium-time', 'high-time', 'low-income', 'medium-income'], desc: '事務作業、スケジュール管理、リサーチなどをオンラインでサポートします。' },
-        { name: 'オンラインコンサル・コーチング', tags: ['coaching', 'service', 'low-time', 'medium-time', 'medium-income', 'high-income'], desc: '専門知識や経験を活かして、個人や企業の相談に乗ります。' },
-        { name: 'ハンドメイド販売', tags: ['manual', 'creative', 'product', 'low-time', 'medium-time', 'high-time', 'low-income', 'medium-income'], desc: 'アクセサリーや小物など、手作りの作品を販売します。' },
+    const talents = [
+        { name: '共感の調律師', tags: ['people', 'empathy', 'support', 'communication'], desc: '人の気持ちを深く理解し、心に寄り添う力。優れたカウンセラーやコーチの素質があります。' },
+        { name: '論理の建築家', tags: ['logic', 'structure', 'planning', 'analysis', 'stepbystep'], desc: '複雑な物事を整理し、堅牢なシステムを構築する力。プロジェクトマネージャーやエンジニアに向いています。' },
+        { name: '創造の探検家', tags: ['creative', 'idea', 'discovery', 'intuition', 'trial'], desc: '常識にとらわれず、新しいアイデアや価値を生み出す力。アーティストや起業家としての才能を秘めています。' },
+        { name: '精密の職人', tags: ['focus', 'detail', 'perfection', 'analysis'], desc: '細部にまでこだわり、物事の質を極限まで高める力。研究者や専門技術職でその力が輝きます。' },
+        { name: '推進力のエンジン', tags: ['lead', 'management', 'teamwork', 'goal'], desc: 'チームを牽引し、目標達成へと導く力。優れたリーダーやプロデューサーになる可能性を秘めています。' },
     ];
     
     const plans = {
-        default: {
-            q1: {
-                title: '第1四半期 (1-3ヶ月): 基礎固めと学習',
-                tasks: [
-                    '関連書籍を3冊以上読み、基礎知識を徹底的にインプットする。',
-                    'UdemyやCourseraなどで関連オンライン講座を1つ受講し、スキルを体系的に学ぶ。',
-                    '自分のポートフォリオ（実績集）となるSNSアカウントやブログを開設する。'
-                ]
-            },
-            q2: {
-                title: '第2四半期 (4-6ヶ月): 実践と最初の収益化',
-                tasks: [
-                    'クラウドソーシングサイト等で、低単価でも良いので最初の案件を1件獲得する。',
-                    '完成した制作物や成果をポートフォリオに追加し、実績を「見える化」する。',
-                    '月々5,000円の安定収入を目標に、継続的に営業またはコンテンツ作成を行う。'
-                ]
-            },
-            q3: {
-                title: '第3四半期 (7-9ヶ月): 成長と単価交渉',
-                tasks: [
-                    '実績を基に、サービス単価の見直しや値上げ交渉を行う。',
-                    '特定の分野に特化し、「〇〇の専門家」としての地位を確立し始める。',
-                    '月々3万円〜5万円の収入を目標に、より高単価な案件や複数のクライアント獲得を目指す。'
-                ]
-            },
-            q4: {
-                title: '第4四半期 (10-12ヶ月): 安定化と次の展開',
-                tasks: [
-                    '作業プロセスを見直し、テンプレートやツールを活用して効率化を図る。',
-                    'これまでの実績をまとめ、情報発信（ブログ、SNS）を強化して集客の自動化を目指す。',
-                    '月々10万円の目標達成、または次の1年に向けた新たな事業計画を立てる。'
-                ]
-            }
+        '共感の調律師': {
+            title: '「共感の調律師」の才能を伸ばすには',
+            tasks: [
+                'カウンセリングやコーチングの入門書を読んでみる。',
+                '地域のボランティア活動に参加し、様々な人の話を聞く機会を作る。',
+                '自分の感情や考えを日記に書き出し、自己理解を深める。'
+            ]
+        },
+        '論理の建築家': {
+            title: '「論理の建築家」の才能を伸ばすには',
+            tasks: [
+                'プログラミング学習サイトで、簡単なロジックを組んでみる。',
+                '日常生活や仕事の中で、非効率なことを見つけて改善案を考えてみる。',
+                'チェスや将棋など、戦略的なボードゲームを趣味にしてみる。'
+            ]
+        },
+        '創造の探検家': {
+            title: '「創造の探検家」の才能を伸ばすには',
+            tasks: [
+                '普段行かない場所へ散歩に行き、新しい発見を探す。',
+                '美術館や展示会に足を運び、多様な表現に触れる。',
+                '一つのテーマについて、制限時間を設けてアイデアを10個書き出す練習をする。'
+            ]
+        },
+        '精密の職人': {
+            title: '「精密の職人」の才能を伸ばすには',
+            tasks: [
+                'プラモデルや手芸など、細かい作業を要する趣味を始めてみる。',
+                '自分の専門分野に関する論文や、より深い技術書を読んでみる。',
+                '時間を計って、一つの作業に没頭する「ポモドーロ・テクニック」を試す。'
+            ]
+        },
+        '推進力のエンジン': {
+            title: '「推進力のエンジン」の才能を伸ばすには',
+            tasks: [
+                '友人との旅行や小さなイベントの幹事を引き受けてみる。',
+                'リーダーシップに関する本や、尊敬する経営者の自伝を読む。',
+                '目標達成アプリを使い、公に目標を宣言して自分を追い込んでみる。'
+            ]
         }
     };
 
@@ -156,17 +163,17 @@ document.addEventListener('DOMContentLoaded', () => {
         
         resultsContainer.innerHTML = '';
         if (recommended.length > 0) {
-            recommended.slice(0, 3).forEach(hustle => {
+            recommended.slice(0, 2).forEach(talent => {
                 resultsContainer.innerHTML += `
                     <div class="result-card">
-                        <h3>${hustle.name}</h3>
-                        <p>${hustle.desc}</p>
-                        <button class="select-btn" data-name="${hustle.name}">この計画を見る</button>
+                        <h3>${talent.name}</h3>
+                        <p>${talent.desc}</p>
+                        <button class="select-btn" data-name="${talent.name}">才能の伸ばし方を見る</button>
                     </div>
                 `;
             });
         } else {
-            resultsContainer.innerHTML = '<p>申し訳ありませんが、あなたに合う副業が見つかりませんでした。条件を変えてお試しください。</p>';
+            resultsContainer.innerHTML = '<p>診断できませんでした。もう一度お試しください。</p>';
         }
 
         questionnaireEl.classList.add('hidden');
@@ -178,18 +185,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getRecommendations() {
-        const scores = sideHustles.map(hustle => {
+        const scores = talents.map(talent => {
             let score = 0;
-            if (hustle.tags.includes(userAnswers.interest)) score += 3;
-            if (hustle.tags.includes(userAnswers.style)) score += 2;
-            
-            const timeMap = { low: 'low-time', medium: 'medium-time', high: 'high-time' };
-            if (hustle.tags.includes(timeMap[userAnswers.time])) score += 1;
-
-            const incomeMap = { low: 'low-income', medium: 'medium-income', high: 'high-income' };
-            if (hustle.tags.includes(incomeMap[userAnswers.income])) score += 1;
-
-            return { ...hustle, score };
+            for (const key in userAnswers) {
+                if (talent.tags.includes(userAnswers[key])) {
+                    score++;
+                }
+            }
+            return { ...talent, score };
         });
 
         return scores.sort((a, b) => b.score - a.score);
@@ -197,16 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showPlan(e) {
         const selectedName = e.target.dataset.name;
-        planTitle.textContent = selectedName;
+        const planData = plans[selectedName];
         
-        const planData = plans.default; // In a more complex app, this could be customized
-        planContainer.innerHTML = '';
-        for (const quarterKey in planData) {
-            const quarter = planData[quarterKey];
-            const tasksHtml = quarter.tasks.map(task => `<li>${task}</li>`).join('');
-            planContainer.innerHTML += `
-                <div class="quarter">
-                    <h3>${quarter.title}</h3>
+        if (planData) {
+            planTitle.textContent = planData.title;
+            const tasksHtml = planData.tasks.map(task => `<li>${task}</li>`).join('');
+            planContainer.innerHTML = `
+                <div class="quarter"> 
                     <ul>${tasksHtml}</ul>
                 </div>
             `;
