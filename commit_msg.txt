@@ -1,1 +1,1 @@
-Rewrite application as "Hidden Talent Discovery Mirror"
+Replace with single-file app and remove old files

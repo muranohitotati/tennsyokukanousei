@@ -4,43 +4,364 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>隠れ才能発掘鏡</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+        body {
+            font-family: 'Kosugi Maru', sans-serif;
+            background-color: #121212;
+            color: #E0E0E0;
+        }
+        .mirror-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 2px solid;
+            border-image: linear-gradient(45deg, #00C6FF, #0072FF, #8E44AD, #C0392B) 1;
+            box-shadow: 0 0 40px rgba(0, 114, 255, 0.5), inset 0 0 20px rgba(142, 68, 173, 0.3);
+            animation: pulse-border 5s infinite cubic-bezier(0.65, 0.05, 0.36, 1);
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-image-slice: 1; }
+            50% { border-image-slice: 5; }
+        }
+        .shimmer {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.2) 20%, rgba(255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0) 100%);
+            animation: shimmer-animation 2s infinite linear;
+        }
+        @keyframes shimmer-animation {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .button-gradient {
+            background-image: linear-gradient(45deg, #00C6FF, #0072FF);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .report-content p, .report-content h3 {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+        .report-content h3 {
+            animation-delay: 0.5s;
+        }
+        .report-content p:nth-child(2) {
+            animation-delay: 1.0s;
+        }
+        .report-content p:nth-child(3) {
+            animation-delay: 1.5s;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>隠れ才能発掘鏡</h1>
-            <p>いくつかの質問に答えて、あなたの隠れた才能を見つけましょう。</p>
-        </header>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen">
 
-        <main id="app">
-            <div id="start-screen">
-                <button id="start-btn">診断を始める</button>
+    <!-- Main Container -->
+    <div class="mirror-container p-6 rounded-3xl max-w-2xl w-full mx-auto">
+        <div class="flex justify-center mb-6">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2 tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
+                隠れ才能発掘鏡
+            </h1>
+        </div>
+        
+        <p class="text-center text-sm sm:text-base text-gray-300 mb-6">
+            いくつかの質問に答えるだけで、AIがあなたの隠れた才能を、奇抜な視点で診断します。
+        </p>
+
+        <!-- Input Area (Updated with detailed categories) -->
+        <div class="mb-6 space-y-4">
+            <div>
+                <label for="gender-select" class="text-gray-300 text-sm font-semibold mb-2 block">性別</label>
+                <select id="gender-select" class="w-full p-2 bg-gray-800 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">選択してください</option>
+                    <option value="男性">男性</option>
+                    <option value="女性">女性</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="current-job" class="text-gray-300 text-sm font-semibold mb-2 block">今の職種</label>
+                <input type="text" id="current-job" placeholder="例: 教師、エンジニア、主婦/主夫" class="w-full p-2 bg-gray-800 rounded-xl text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
-            <div id="questionnaire" class="hidden">
-                <div id="question-container"></div>
-                <div id="progress-bar-container">
-                    <div id="progress-bar"></div>
+            <div>
+                <label for="interested-job" class="text-gray-300 text-sm font-semibold mb-2 block">興味のある職種</label>
+                <input type="text" id="interested-job" placeholder="例: デザイナー、マーケター、図書館司書" class="w-full p-2 bg-gray-800 rounded-xl text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <h2 class="text-lg font-semibold mb-2 text-gray-200">あなたの趣味・習慣</h2>
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <!-- Checkbox Options -->
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="毎朝コーヒーを淹れる" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">毎朝コーヒーを淹れる</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="古い映画を見る" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">古い映画を見る</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="散歩中に写真を撮る" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">散歩中に写真を撮る</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="料理のレシピを独自にアレンジする" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">料理のレシピを独自にアレンジする</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="DIYや修理をする" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">DIYや修理をする</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="日記やブログを書く" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">日記やブログを書く</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-gray-700 hover:bg-gray-600 rounded-full px-4 py-2 transition-colors cursor-pointer">
+                        <input type="checkbox" name="hobbies" value="庭いじりや植物を育てる" class="form-checkbox h-4 w-4 text-blue-500 rounded focus:ring-blue-500">
+                        <span class="text-gray-200 text-sm">庭いじりや植物を育てる</span>
+                    </label>
                 </div>
+                <label class="text-gray-300 text-sm">その他 (自由に入力):</label>
+                <textarea id="other-hobbies" class="w-full h-20 mt-2 p-4 bg-gray-800 rounded-xl text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="例: 猫と話すこと、新しい言語の学習..."></textarea>
             </div>
+        </div>
 
-            <div id="results" class="hidden">
-                <h2>あなたの隠れた才能</h2>
-                <div id="results-container"></div>
-            </div>
+        <!-- Button -->
+        <div class="flex justify-center mb-8">
+            <button id="diagnose-button" class="button-gradient text-white font-bold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                鏡を覗き込む
+            </button>
+        </div>
 
-            <div id="plan" class="hidden">
-                <h2><span id="plan-title"></span></h2>
-                <div id="plan-container"></div>
-                <button id="restart-btn">もう一度診断する</button>
-            </div>
-        </main>
+        <!-- Loading and Result Area -->
+        <div id="loading-container" class="flex justify-center items-center py-8 hidden">
+            <div class="spinner"></div>
+            <p class="ml-4 text-lg">鏡が思考しています...</p>
+        </div>
 
-        <footer>
-            <p>&copy; 2024 隠れ才能発掘鏡</p>
-        </footer>
+        <div id="result-container" class="report-content p-6 rounded-2xl bg-gray-800 hidden">
+            <!-- AI report will be inserted here -->
+        </div>
+
+        <!-- Visualization Canvas -->
+        <div id="visualization-container" class="w-full flex justify-center mt-6 hidden">
+            <canvas id="talent-canvas" class="w-full h-64 sm:h-80 rounded-2xl bg-gray-900 border border-gray-700"></canvas>
+        </div>
     </div>
-    <script src="script.js"></script>
+
+    <script type="module">
+        // Gemini API configuration
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=';
+        const apiKey = ""; // Canvas will provide this in runtime
+
+        // UI Elements
+        const diagnoseButton = document.getElementById('diagnose-button');
+        const genderSelect = document.getElementById('gender-select');
+        const currentJobInput = document.getElementById('current-job');
+        const interestedJobInput = document.getElementById('interested-job');
+        const checkboxes = document.querySelectorAll('input[name="hobbies"]');
+        const otherHobbiesText = document.getElementById('other-hobbies');
+        const loadingContainer = document.getElementById('loading-container');
+        const resultContainer = document.getElementById('result-container');
+        const visualizationContainer = document.getElementById('visualization-container');
+        const canvas = document.getElementById('talent-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Initial canvas setup
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let isAnimating = false;
+        let animationFrameId;
+
+        // Function to handle the button click and AI call
+        diagnoseButton.addEventListener('click', async () => {
+            const gender = genderSelect.value;
+            const currentJob = currentJobInput.value.trim();
+            const interestedJob = interestedJobInput.value.trim();
+            
+            // Get selected hobbies from checkboxes
+            const selectedHobbies = Array.from(checkboxes)
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+
+            // Add value from "Other" text field if it exists
+            if (otherHobbiesText.value.trim() !== '') {
+                selectedHobbies.push(otherHobbiesText.value.trim());
+            }
+
+            // Construct the comprehensive prompt
+            let userPrompt = '';
+            if (gender) userPrompt += `性別: ${gender}, `;
+            if (currentJob) userPrompt += `現在の職種: ${currentJob}, `;
+            if (interestedJob) userPrompt += `興味のある職種: ${interestedJob}, `;
+            if (selectedHobbies.length > 0) userPrompt += `趣味・習慣: ${selectedHobbies.join(', ')}`;
+
+            if (userPrompt === '') {
+                // Show a simple message instead of an alert
+                resultContainer.innerHTML = `<p class="text-center text-yellow-400">何か項目を選択または入力してください。</p>`;
+                resultContainer.classList.remove('hidden');
+                return;
+            }
+
+            // Show loading state
+            diagnoseButton.disabled = true;
+            loadingContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            visualizationContainer.classList.add('hidden');
+            stopVisualization();
+
+            try {
+                const response = await fetch(API_URL + apiKey, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: userPrompt }] }],
+                        systemInstruction: {
+                            parts: [{ text: "あなたは「隠れ才能発掘鏡」という名の奇妙で芸術的なAIアシスタントです。ユーザーが入力した情報（性別、職種、趣味、習慣など）から、奇抜な連想とユニークな視覚化のアイデアを交え、「隠れた才能」を日本語で発見し、詩的なレポートとして出力してください。出力は必ず以下の形式で、直接本文から始めてください。### 才能名: [才能のユニークなタイトル]### 診断結果: [奇抜な分析内容]### 視覚化アイデア: [才能を表現するための視覚的なアイデア]" }]
+                        },
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (text) {
+                    // Display the generated report
+                    resultContainer.innerHTML = text.replace(/###/g, '<h3 class="text-xl sm:text-2xl font-bold mt-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600">').replace(/\n/g, '<br>');
+                    resultContainer.classList.remove('hidden');
+                    visualizationContainer.classList.remove('hidden');
+                    startVisualization(text.length);
+                } else {
+                    resultContainer.innerHTML = `<p class="text-center text-red-400">診断に失敗しました。もう一度お試しください。</p>`;
+                    resultContainer.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error('API call failed:', error);
+                resultContainer.innerHTML = `<p class="text-center text-red-400">エラーが発生しました。インターネット接続を確認してください。</p>`;
+                resultContainer.classList.remove('hidden');
+            } finally {
+                // Hide loading state and re-enable button
+                loadingContainer.classList.add('hidden');
+                diagnoseButton.disabled = false;
+            }
+        });
+
+        // Visualization Logic
+        let particles = [];
+        const numParticles = 100;
+
+        function createParticles(count, color) {
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    radius: Math.random() * 2 + 1,
+                    color: color,
+                    alpha: Math.random() * 0.5 + 0.5
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${p.color.r}, ${p.color.g}, ${p.color.b}, ${p.alpha})`;
+                ctx.fill();
+            }
+            // Draw lines between nearby particles
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p1 = particles[i];
+                    const p2 = particles[j];
+                    const distance = Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(${p1.color.r}, ${p1.color.g}, ${p1.color.b}, ${0.5 - distance / 200})`;
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            updateParticles();
+            drawParticles();
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function startVisualization(seed) {
+            if (isAnimating) {
+                stopVisualization();
+            }
+            // Generate color based on the report length as a seed
+            const hue = (seed * 137.5) % 360;
+            const color = {
+                r: Math.floor(100 + Math.cos(hue) * 100),
+                g: Math.floor(100 + Math.sin(hue) * 100),
+                b: Math.floor(100 + Math.cos(hue * 2) * 100)
+            };
+            createParticles(numParticles, color);
+            isAnimating = true;
+            animate();
+        }
+
+        function stopVisualization() {
+            if (isAnimating) {
+                cancelAnimationFrame(animationFrameId);
+                isAnimating = false;
+            }
+        }
+
+        // Initially stop visualization
+        stopVisualization();
+        
+    </script>
 </body>
 </html>
