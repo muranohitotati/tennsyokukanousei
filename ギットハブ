@@ -1,0 +1,68 @@
+✦ 承知いたしました。
+  既存のGitHubリポジトリ enni815/fukugyo-shindan-sheet を使ってGitHub Pagesでサイトを公開する方法ですね。Gitコマ
+  ンドが使えない状況を考慮し、すべてウェブサイト上の操作で完結する方法を詳しくご案内します。
+
+  ---
+
+  手順1：ウェブサイトの元になるファイル(index.html)をアップロードする
+
+  まず、公開したいウェブサイトの本体となるファイルをGitHubリポジトリに置く必要があります。先ほど私が作成した
+  index.html を使いましょう。
+
+
+   1. ブラウザでご自身のGitHubリポジトリを開きます。
+      https://github.com/enni815/fukugyo-shindan-sheet (https://github.com/enni815/fukugyo-shindan-sheet)
+
+
+   2. 画面の右上あたりにある Add file ボタンをクリックし、ドロップダウンメニューから Upload files を選択します。
+
+
+
+   3. ファイルのアップロード画面が表示されます。
+      先ほど私が作成した index.html ファイル（パス： C:\GeminiCli\TEST\index.html ）を、画面の "Drag files here
+  to add them to your repository" と書かれている領域にドラッグ＆ドロップしてください。
+
+
+   4. ファイルが追加されたら、画面下部の Commit changes
+      という緑色のボタンをクリックします。これでファイルの追加は完了です。
+
+  手順2：GitHub Pagesを有効にする
+
+  次に、アップロードしたファイルを使ってウェブサイトを公開する設定を行います。
+
+
+   1. リポジトリのページ（こちら (https://github.com/enni815/fukugyo-shindan-sheet)）の上部にあるタブから
+      Settings をクリックします。
+
+
+
+   2. 左側のメニューから Pages をクリックします。
+
+
+   3. "Build and deployment" というセクションの "Source" で、Deploy from a branch
+      を選択します。（おそらくデフォルトで選択されています）
+
+
+   4. 同じセクション内の "Branch" の設定で、ブランチを main （または master）、フォルダを / (root)
+      に設定し、Save ボタンをクリックします。
+
+
+
+  手順3：公開されたサイトの確認
+
+  設定を保存すると、GitHubがサイトの公開準備を始めます。通常1〜2分で完了します。
+
+  同じ Pages の設定画面の上部に「Your site is live at
+  ...」というメッセージと、公開されたサイトのURLが表示されます。
+
+
+  お客様のサイトのURLは、おそらく以下のようになります。
+  https://enni815.github.io/fukugyo-shindan-sheet/
+
+  このURLにアクセスして、"Gemini - 副業診断ツールの提案" と表示されれば成功です。
+
+  ---
+
+
+  以上が、ウェブサイトの操作だけでGitHub Pagesを公開する手順です。
+  もし途中でわからないことがあれば、お気軽にご質問ください。
