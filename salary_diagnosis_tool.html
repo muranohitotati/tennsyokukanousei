@@ -223,122 +223,91 @@
 
         // Function to handle the button click and AI call (with retry logic)
         diagnoseButton.addEventListener('click', async () => {
-            
+
             // 1. Collect all data
             const age = ageSelect.value;
             const experience = experienceSelect.value;
             const satisfaction = satisfactionSelect.value;
             const desired = desiredIndustryInput.value.trim();
-            
-            const checkedMotivation = getCheckedValues('motivation');
-            const otherMotivation = otherMotivationInput.value.trim(); // 新規
-            const checkedConcerns = getCheckedValues('concerns');
-            const otherConcerns = otherConcernsInput.value.trim(); // 新規
+
+            const checkedMotivation = Array.from(document.querySelectorAll('input[name="motivation"]:checked'))
+                                .map(cb => cb.value);
+            const otherMotivation = otherMotivationInput.value.trim();
+            if (otherMotivation) checkedMotivation.push(otherMotivation);
 
             const strengths = strengthsInput.value.trim();
 
-            // 2. Formulate the comprehensive prompt
-            let inputData = [];
-            if (age) inputData.push(`年齢層: ${age}`);
-            if (experience) inputData.push(`職務経験年数: ${experience}`);
-            if (satisfaction) inputData.push(`現職満足度: ${satisfaction}`);
-            if (desired) inputData.push(`希望業界・職種: ${desired}`);
+            const checkedConcerns = Array.from(document.querySelectorAll('input[name="concerns"]:checked'))
+                                .map(cb => cb.value);
+            const otherConcerns = otherConcernsInput.value.trim();
+            if (otherConcerns) checkedConcerns.push(otherConcerns);
 
-            // 動機 (チェックボックス + 自由記入)
-            const allMotivation = [checkedMotivation, otherMotivation].filter(s => s).join(', ');
-            if (allMotivation) inputData.push(`転職の主な動機: ${allMotivation}`);
+            // Combine all user inputs into a single array of keywords for matching
+            const userKeywords = [age, experience, satisfaction, desired, ...checkedMotivation, strengths, ...checkedConcerns].filter(Boolean);
 
-            if (strengths) inputData.push(`あなたの強み: ${strengths}`);
-            
-            // 懸念点 (チェックボックス + 自由記入)
-            const allConcerns = [checkedConcerns, otherConcerns].filter(s => s).join(', ');
-            if (allConcerns) inputData.push(`最大の懸念点: ${allConcerns}`);
-
-
-            const userQuery = inputData.join(' | ');
-
-            if (userQuery.length < 50) {
-                reportContent.innerHTML = `<p class="text-center text-yellow-400">診断には、最低限「年齢層」「経験年数」「希望業界・職種」などの詳細な情報が必要です。</p>`;
+            if (userKeywords.length === 0) {
+                reportContent.innerHTML = `<p class="text-center text-yellow-400">診断には、何らかの情報を入力してください。</p>`;
                 resultContainer.classList.remove('hidden');
                 return;
             }
 
-            // 3. UI State: Loading
+            // 2. UI State: Loading
             diagnoseButton.disabled = true;
             buttonText.textContent = '診断中...';
             loadingSpinner.classList.remove('hidden');
             resultContainer.classList.add('hidden');
             reportContent.innerHTML = '';
 
-            const systemPrompt = `
-                あなたは転職・キャリア戦略の専門家であり、ユーザーの転職成功可能性を診断します。
-                ユーザーの入力データ（満足度、希望業界・職種、動機、強み、懸念点など）を分析し、**転職の可能性と具体的な戦略**を提示してください。
-                
-                出力は以下の3つのセクションからなる、詳細でプロフェッショナルなレポート形式で日本語で記述してください。
-
-                1.  **転職成功可能性 (総合評価):** [具体的な成功確率 (例: 75% - 「高」)] - 総合的な成功確率と簡潔な評価。
-                2.  **成功/困難の主要因:** [入力情報から見た、転職成功を助けるポジティブな要素と、注意すべきネガティブな要素の具体的分析]
-                3.  **可能性を高めるための具体的な行動ステップ:** [成功率を高めるために直ちに始めるべき、具体的で実現可能な3つのアクションプラン（例：市場調査、特定のスキル習得、応募書類のブラッシュアップ）]
-
-                レポートの各セクションは改行で区切り、見出しを強調して表示してください。
-            `;
-
-            const maxRetries = 5;
-            let currentRetry = 0;
-            let success = false;
             let finalResultText = '';
 
-            while (currentRetry < maxRetries && !success) {
-                try {
-                    const response = await fetch(API_URL + apiKey, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: userQuery }] }],
-                            systemInstruction: { parts: [{ text: systemPrompt }] },
-                        })
-                    });
+            try {
+                // Fetch the diagnosis patterns from the JSON file
+                const response = await fetch('diagnosis_patterns.json');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch diagnosis patterns: ${response.status}`);
+                }
+                const data = await response.json();
+                const patterns = data.patterns;
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                // Basic matching logic: Find the first pattern where all its input_keywords are present in userKeywords
+                let matchedPattern = null;
+                for (const pattern of patterns) {
+                    const allKeywordsMatch = pattern.input_keywords.every(keyword => userKeywords.includes(keyword));
+                    if (allKeywordsMatch) {
+                        matchedPattern = pattern;
+                        break; // Found a match, use the first one
                     }
-                    
-                    const result = await response.json();
-                    finalResultText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                    
-                    if (finalResultText) {
-                        success = true;
-                        break;
-                    }
-
-                } catch (error) {
-                    console.error('Attempt failed:', error);
                 }
 
-                currentRetry++;
-                if (currentRetry < maxRetries) {
-                    const delay = Math.pow(2, currentRetry) * 1000;
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                if (matchedPattern) {
+                    finalResultText = `1. 転職成功可能性 (総合評価): ${matchedPattern.result.probability}
+2. 成功/困難の主要因: ${matchedPattern.result.factors}
+3. 可能性を高めるための具体的な行動ステップ: ${matchedPattern.result.steps}`;
+                } else {
+                    finalResultText = `<p class="text-center text-yellow-400">恐れ入りますが、現在の入力に合致する診断パターンが見つかりませんでした。入力内容を調整してお試しください。</p>`;
                 }
+
+            } catch (error) {
+                console.error('Error during diagnosis:', error);
+                finalResultText = `<p class="text-center text-red-400">診断中にエラーが発生しました。時間をおいて再度お試しください。</p>`;
             }
 
-
-            // 4. Process and Display the report
+            // 3. Process and Display the report
             if (finalResultText) {
                 const formattedText = finalResultText
                     .replace(/1\. 転職成功可能性 \(総合評価\):/g, '<div class="report-section"><h3 class="text-xl font-bold text-yellow-300 mb-2">1. 転職成功可能性 (総合評価)</h3><p class="text-3xl font-extrabold text-[#5cb85c] mb-4">')
                     .replace(/2\. 成功\/困難の主要因:/g, '</p></div><div class="report-section"><h3 class="text-xl font-bold text-white mb-2">2. 成功/困難の主要因</h3><p>')
                     .replace(/3\. 可能性を高めるための具体的な行動ステップ:/g, '</p></div><div class="report-section"><h3 class="text-xl font-bold text-white mb-2">3. 可能性を高めるための具体的な行動ステップ</h3><p>')
                     .replace(/\n/g, '<br>') + '</p></div>';
-                    
+
                 reportContent.innerHTML = formattedText;
                 resultContainer.classList.remove('hidden');
             } else {
                 reportContent.innerHTML = `<p class="text-center text-red-400">診断レポートの生成に失敗しました。時間をおいて再度お試しください。</p>`;
                 resultContainer.classList.remove('hidden');
             }
-            
-            // 5. UI State: Reset
+
+            // 4. UI State: Reset
             diagnoseButton.disabled = false;
             buttonText.textContent = '転職可能性を診断する';
             loadingSpinner.classList.add('hidden');
