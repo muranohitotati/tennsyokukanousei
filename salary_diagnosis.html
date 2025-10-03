@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>転職可能性診断ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
+        body {
+            font-family: 'Kosugi Maru', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        .main-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .button-gradient {
+            background-image: linear-gradient(90deg, #28a745, #5cb85c); /* Green gradient for positivity */
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button-gradient:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #5cb85c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Report styling for emphasis */
+        .report-section {
+            border-left: 4px solid #5cb85c;
+            padding-left: 1rem;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center justify-center min-h-screen">
+
+    <!-- Main Container -->
+    <div class="main-container p-6 sm:p-8 rounded-xl max-w-3xl w-full mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2">
+                あなたの転職可能性診断
+            </h1>
+            <p class="text-sm text-gray-400">あなたの現状と動機に基づき、AIが転職成功確率と具体的な戦略を診断します。</p>
+        </header>
+
+        <!-- Input Form -->
+        <div class="space-y-6">
+            <!-- 1. 基本情報と現状 -->
+            <div class="bg-[#21262d] p-4 rounded-lg">
+                <h2 class="text-lg font-semibold text-[#5cb85c] mb-3">1. 基本情報と現職満足度</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label for="age-select" class="block text-sm font-medium mb-1">年齢層</label>
+                        <select id="age-select" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:ring-green-500 focus:border-green-500">
+                            <option value="">選択してください</option>
+                            <option value="20代前半">20代前半</option>
+                            <option value="20代後半">20代後半</option>
+                            <option value="30代前半">30代前半</option>
+                            <option value="30代後半">30代後半</option>
+                            <option value="40代">40代</option>
+                            <option value="50代以上">50代以上</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="experience-select" class="block text-sm font-medium mb-1">職務経験年数</label>
+                        <select id="experience-select" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:ring-green-500 focus:border-green-500">
+                            <option value="">選択してください</option>
+                            <option value="0-3年">0-3年</option>
+                            <option value="4-7年">4-7年</option>
+                            <option value="8-15年">8-15年</option>
+                            <option value="16年以上">16年以上</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="satisfaction-select" class="block text-sm font-medium mb-1">現職への満足度</label>
+                        <select id="satisfaction-select" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white focus:ring-green-500 focus:border-green-500">
+                            <option value="">選択してください</option>
+                            <option value="非常に不満 (いますぐ辞めたい)">非常に不満</option>
+                            <option value="やや不満 (良いオファーがあれば転職したい)">やや不満</option>
+                            <option value="普通 (どちらでもない)">普通</option>
+                            <option value="やや満足 (不満はないが成長したい)">やや満足</option>
+                            <option value="非常に満足 (現職に満足している)">非常に満足</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 希望と動機 -->
+            <div class="bg-[#21262d] p-4 rounded-lg">
+                <h2 class="text-lg font-semibold text-[#5cb85c] mb-3">2. 転職の希望と動機</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="desired-industry-input" class="block text-sm font-medium mb-1">希望する転職先の業界・職種</label>
+                        <input type="text" id="desired-industry-input" placeholder="例: IT企業のPM、または異業界のコンサルタント" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white placeholder-gray-500 focus:ring-green-500 focus:border-green-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">転職の主な動機 (複数選択可)</label>
+                        <div class="flex flex-wrap gap-2 text-sm">
+                            <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                                <input type="checkbox" name="motivation" value="年収アップ" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                                <span class="text-gray-300">年収アップ</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                                <input type="checkbox" name="motivation" value="スキル・キャリアアップ" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                                <span class="text-gray-300">スキル・キャリアアップ</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                                <input type="checkbox" name="motivation" value="ワークライフバランス改善" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                                <span class="text-gray-300">ワークライフバランス改善</span>
+                            </label>
+                            <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                                <input type="checkbox" name="motivation" value="企業文化・風土への不満" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                                <span class="text-gray-300">企業文化への不満</span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- 追加: その他の動機入力欄 -->
+                    <div>
+                        <label for="other-motivation-input" class="block text-sm font-medium mb-1">その他の動機 (自由記入)</label>
+                        <textarea id="other-motivation-input" rows="2" placeholder="例: 地方移住したい、経営層に近い立場で働きたい" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white placeholder-gray-500 focus:ring-green-500 focus:border-green-500"></textarea>
+                    </div>
+                    <!-- end of その他の動機入力欄 -->
+                    <div>
+                        <label for="strengths-input" class="block text-sm font-medium mb-1">あなたの強み・アピールポイント</label>
+                        <textarea id="strengths-input" rows="2" placeholder="例: 粘り強い交渉力、〇〇技術の専門知識、チームマネジメント経験" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white placeholder-gray-500 focus:ring-green-500 focus:border-green-500"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 懸念事項 -->
+            <div class="bg-[#21262d] p-4 rounded-lg">
+                <h2 class="text-lg font-semibold text-[#5cb85c] mb-3">3. 転職における懸念事項</h2>
+                <label class="block text-sm font-medium mb-1">最大の懸念点 (複数選択可)</label>
+                <div class="flex flex-wrap gap-2 text-sm">
+                    <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                        <input type="checkbox" name="concerns" value="経験・スキルが不足している" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                        <span class="text-gray-300">経験・スキル不足</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                        <input type="checkbox" name="concerns" value="年齢がネックになるのではないか" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                        <span class="text-gray-300">年齢の壁</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                        <input type="checkbox" name="concerns" value="希望する年収に届かない" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                        <span class="text-gray-300">年収の不安</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                        <input type="checkbox" name="concerns" value="転職先がブラック企業ではないか" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                        <span class="text-gray-300">企業文化への不安</span>
+                    </label>
+                    <label class="flex items-center space-x-2 bg-[#0d1117] rounded-full px-3 py-1 cursor-pointer hover:bg-[#2c333b]">
+                        <input type="checkbox" name="concerns" value="特に大きな懸念はない" class="form-checkbox h-4 w-4 text-green-500 rounded border-gray-600 focus:ring-green-500">
+                        <span class="text-gray-300">特にない</span>
+                    </label>
+                </div>
+                <!-- 追加: その他の懸念点入力欄 -->
+                <div class="mt-4">
+                    <label for="other-concerns-input" class="block text-sm font-medium mb-1">その他の懸念点 (自由記入)</label>
+                    <textarea id="other-concerns-input" rows="2" placeholder="例: 家族の理解が得られるか、新しい環境に馴染めるか" class="w-full p-2 rounded-md bg-[#0d1117] border border-[#30363d] text-white placeholder-gray-500 focus:ring-green-500 focus:border-green-500"></textarea>
+                </div>
+                <!-- end of その他の懸念点入力欄 -->
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="flex justify-center mt-8">
+            <button id="diagnose-button" class="button-gradient text-white font-bold py-3 px-12 rounded-full shadow-lg transition-all duration-300 flex items-center justify-center">
+                <span id="button-text">転職可能性を診断する</span>
+                <div id="loading-spinner" class="spinner ml-3 hidden"></div>
+            </button>
+        </div>
+
+        <!-- Result Area -->
+        <div id="result-container" class="mt-10 p-6 rounded-xl bg-[#21262d] border border-[#30363d] hidden">
+            <h2 class="text-2xl font-bold text-[#5cb85c] mb-4 text-center">診断レポート</h2>
+            <div id="report-content" class="text-gray-300 whitespace-pre-wrap">
+                <!-- AI report will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Gemini API configuration
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=';
+        const apiKey = ""; // Canvas will provide this in runtime
+
+        // UI Elements
+        const diagnoseButton = document.getElementById('diagnose-button');
+        const buttonText = document.getElementById('button-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const resultContainer = document.getElementById('result-container');
+        const reportContent = document.getElementById('report-content');
+
+        const ageSelect = document.getElementById('age-select');
+        const experienceSelect = document.getElementById('experience-select');
+        const satisfactionSelect = document.getElementById('satisfaction-select');
+        const desiredIndustryInput = document.getElementById('desired-industry-input');
+        const motivationCheckboxes = document.querySelectorAll('input[name="motivation"]');
+        const otherMotivationInput = document.getElementById('other-motivation-input'); // 新規
+        const strengthsInput = document.getElementById('strengths-input');
+        const concernsCheckboxes = document.querySelectorAll('input[name="concerns"]');
+        const otherConcernsInput = document.getElementById('other-concerns-input'); // 新規
+
+        // Helper function to collect checkbox values
+        const getCheckedValues = (name) => {
+            return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+                        .map(cb => cb.value)
+                        .join(', ');
+        };
+
+        // Function to handle the button click and AI call (with retry logic)
+        diagnoseButton.addEventListener('click', async () => {
+            
+            // 1. Collect all data
+            const age = ageSelect.value;
+            const experience = experienceSelect.value;
+            const satisfaction = satisfactionSelect.value;
+            const desired = desiredIndustryInput.value.trim();
+            
+            const checkedMotivation = getCheckedValues('motivation');
+            const otherMotivation = otherMotivationInput.value.trim(); // 新規
+            const checkedConcerns = getCheckedValues('concerns');
+            const otherConcerns = otherConcernsInput.value.trim(); // 新規
+
+            const strengths = strengthsInput.value.trim();
+
+            // 2. Formulate the comprehensive prompt
+            let inputData = [];
+            if (age) inputData.push(`年齢層: ${age}`);
+            if (experience) inputData.push(`職務経験年数: ${experience}`);
+            if (satisfaction) inputData.push(`現職満足度: ${satisfaction}`);
+            if (desired) inputData.push(`希望業界・職種: ${desired}`);
+
+            // 動機 (チェックボックス + 自由記入)
+            const allMotivation = [checkedMotivation, otherMotivation].filter(s => s).join(', ');
+            if (allMotivation) inputData.push(`転職の主な動機: ${allMotivation}`);
+
+            if (strengths) inputData.push(`あなたの強み: ${strengths}`);
+            
+            // 懸念点 (チェックボックス + 自由記入)
+            const allConcerns = [checkedConcerns, otherConcerns].filter(s => s).join(', ');
+            if (allConcerns) inputData.push(`最大の懸念点: ${allConcerns}`);
+
+
+            const userQuery = inputData.join(' | ');
+
+            if (userQuery.length < 50) {
+                reportContent.innerHTML = `<p class="text-center text-yellow-400">診断には、最低限「年齢層」「経験年数」「希望業界・職種」などの詳細な情報が必要です。</p>`;
+                resultContainer.classList.remove('hidden');
+                return;
+            }
+
+            // 3. UI State: Loading
+            diagnoseButton.disabled = true;
+            buttonText.textContent = '診断中...';
+            loadingSpinner.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            reportContent.innerHTML = '';
+
+            const systemPrompt = `
+                あなたは転職・キャリア戦略の専門家であり、ユーザーの転職成功可能性を診断します。
+                ユーザーの入力データ（満足度、希望業界・職種、動機、強み、懸念点など）を分析し、**転職の可能性と具体的な戦略**を提示してください。
+                
+                出力は以下の3つのセクションからなる、詳細でプロフェッショナルなレポート形式で日本語で記述してください。
+
+                1.  **転職成功可能性 (総合評価):** [具体的な成功確率 (例: 75% - 「高」)] - 総合的な成功確率と簡潔な評価。
+                2.  **成功/困難の主要因:** [入力情報から見た、転職成功を助けるポジティブな要素と、注意すべきネガティブな要素の具体的分析]
+                3.  **可能性を高めるための具体的な行動ステップ:** [成功率を高めるために直ちに始めるべき、具体的で実現可能な3つのアクションプラン（例：市場調査、特定のスキル習得、応募書類のブラッシュアップ）]
+
+                レポートの各セクションは改行で区切り、見出しを強調して表示してください。
+            `;
+
+            const maxRetries = 5;
+            let currentRetry = 0;
+            let success = false;
+            let finalResultText = '';
+
+            while (currentRetry < maxRetries && !success) {
+                try {
+                    const response = await fetch(API_URL + apiKey, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: userQuery }] }],
+                            systemInstruction: { parts: [{ text: systemPrompt }] },
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    finalResultText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (finalResultText) {
+                        success = true;
+                        break;
+                    }
+
+                } catch (error) {
+                    console.error('Attempt failed:', error);
+                }
+
+                currentRetry++;
+                if (currentRetry < maxRetries) {
+                    const delay = Math.pow(2, currentRetry) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+
+            // 4. Process and Display the report
+            if (finalResultText) {
+                const formattedText = finalResultText
+                    .replace(/1\. 転職成功可能性 \(総合評価\):/g, '<div class="report-section"><h3 class="text-xl font-bold text-yellow-300 mb-2">1. 転職成功可能性 (総合評価)</h3><p class="text-3xl font-extrabold text-[#5cb85c] mb-4">')
+                    .replace(/2\. 成功\/困難の主要因:/g, '</p></div><div class="report-section"><h3 class="text-xl font-bold text-white mb-2">2. 成功/困難の主要因</h3><p>')
+                    .replace(/3\. 可能性を高めるための具体的な行動ステップ:/g, '</p></div><div class="report-section"><h3 class="text-xl font-bold text-white mb-2">3. 可能性を高めるための具体的な行動ステップ</h3><p>')
+                    .replace(/\n/g, '<br>') + '</p></div>';
+                    
+                reportContent.innerHTML = formattedText;
+                resultContainer.classList.remove('hidden');
+            } else {
+                reportContent.innerHTML = `<p class="text-center text-red-400">診断レポートの生成に失敗しました。時間をおいて再度お試しください。</p>`;
+                resultContainer.classList.remove('hidden');
+            }
+            
+            // 5. UI State: Reset
+            diagnoseButton.disabled = false;
+            buttonText.textContent = '転職可能性を診断する';
+            loadingSpinner.classList.add('hidden');
+        });
+        
+    </script>
+</body>
+</html>
